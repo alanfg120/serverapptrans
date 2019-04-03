@@ -1,0 +1,22 @@
+{
+  "name": "serverapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alanfg120/serverapptrans.git"
+  },
+  "author": "Alan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alanfg120/serverapptrans/issues"
+  },
+  "homepage": "https://github.com/alanfg120/serverapptrans#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
