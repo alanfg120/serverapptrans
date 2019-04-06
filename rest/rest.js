@@ -8,15 +8,8 @@ const dbName = "apptrans"
 const url = 'mongodb://localhost:27017';
 
 var { buildSchema } = require('graphql');
-
-
-
 router.get("/login", (req, res) => {
    
-
-
-
-
 });
 
   module.exports = router;
