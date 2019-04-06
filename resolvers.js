@@ -1,20 +1,25 @@
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
-var jwtClave = "adsgkgsf";
 var MongoClient = require("mongodb").MongoClient;
-const { ObjectId } = require("mongodb")
-const dbName = "apptrans"
-const url = 'mongodb://localhost:27017';
-
+const { ObjectId } = require("mongodb");
+const dbName = "apptrans";
+const url = "mongodb://localhost:27017";
 
 var resolvers = {
   hello: () => "Hello world!",
-  usuario: () => {
-    return {
-      id: "12",
-      name: "alan",
-      lastname: "hola"
-    };
+  usuario: async({ name, pwd }) => {
+    MongoClient.connect(url, function(err, client) {
+      const db = client.db(dbName);
+      db.collection("Usuarios")
+        .find({ $and: [{ name: name }, { pwd: pwd }] })
+        .count()
+        .then(value => {
+          console.log(value);
+        });
+
+      client.close();
+    });
+    return { name: name, token: "hdfhjdfhsdjfh" };
   }
 };
 

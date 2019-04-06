@@ -1,18 +1,18 @@
-var resolvers=require('./resolvers')
-
 var { buildSchema } = require('graphql');
 
 var schema = buildSchema(`
   type Query {
     hello: String
-    usuario: User
+    usuario(name:String,pwd:String): Usuario
   }
-  type User{
-    id:String
+  type Usuario{
+    _id:String
     name:String
-    lastname:String
-  }
-`);
+    token: String
+    }
+
+
+    `);
 
 
 module.exports=schema
