@@ -10,9 +10,7 @@ var schema = buildSchema(`
     name:String
     token: String
     }
-
-
-    `);
+   `);
 
 
 module.exports=schema
