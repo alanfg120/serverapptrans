@@ -7,8 +7,8 @@ var jwtClave="alan";
 var  schema =require('./schema')
 var  resolves=require('./resolvers')
 var app = express();
-const fileUpload = require('express-fileupload');
 
+ var router = require("./rest");
 app.use(cors());
 
 app.use(express.urlencoded());
@@ -19,14 +19,15 @@ app.use( (err, req, res, next)=> {
     res.status(401).send('No Autorizado');
   }
 });
-
+app.use(router);
 app.use('/graphql',graphqlHTTP({
    graphiql: true,
    rootValue: resolves,
    schema:schema
 }));
 
-app.get('/login',(req,res)=>{
+
+/* app.get('/login',(req,res)=>{
 var token=jwt.sign({ name: 'alan' }, jwtClave)
 console.log(token);
 res.send("listo")
@@ -44,7 +45,7 @@ app.post('/conductor',(req,res)=>{
 
   console.log(req.body);
   res.send(req.body)
-})
+}) */
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
