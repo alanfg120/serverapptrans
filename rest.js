@@ -5,7 +5,7 @@ var MongoClient = require("mongodb").MongoClient;
 const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const url = "mongodb://localhost:27017";
-const fileUpload = require('express-fileupload');
+const fileUpload = require("express-fileupload");
 
 router.get("/login", (req, res) => {
   var token = jwt.sign({ name: "alan" }, jwtClave);
@@ -16,13 +16,23 @@ router.get("/login", (req, res) => {
 router.post("/upload", fileUpload(), (req, res) => {
   Object.values(req.files).forEach(file => {
     console.log(file.name);
-    file.mv("Documentos/Conductores/" + file.name, err => {});
+    file.mv(
+      "Documentos/Conductores/" + req.body.cedula + "/" + file.name,
+      err => {}
+    );
   });
-  res.send({ status: "ok" });
+  res.send({ status: true });
 });
 
 router.post("/conductor", (req, res) => {
   console.log(req.body);
-  res.send(req.body);
+  MongoClient.connect(url, function(err, client) {
+    const db = client.db(dbName);
+    db.collection("conductores").insert(req.body, (err, data) => {
+     console.log(data);
+     es.send({ status: true });
+    });
+    client.close();
+  });
 });
 module.exports = router;
