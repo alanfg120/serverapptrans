@@ -10,6 +10,8 @@ const fileUpload = require("express-fileupload");
 var jwtClave = "alan";
 
 router.post("/login", (req, res) => {
+  console.log(req.body);
+  
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("usuarios")
@@ -17,8 +19,8 @@ router.post("/login", (req, res) => {
       .count()
       .then(c => {
         if (c > 0) {
-          var token = jwt.sign({ name: req.body.username }, jwtClave);
-          res.status(200).send({ status: true, token });
+         var token = jwt.sign({ name: req.body.username }, jwtClave);
+          res.status(200).send({ auth: true, token });
         } else res.status(400).send({ error: true });
       });
     clt.close();
