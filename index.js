@@ -11,7 +11,7 @@ app.use(cors());
 //app.use(express.static('Documentos'));
 app.use(express.urlencoded());
 app.use(express.json())
-//app.use(expressJwt({secret:jwtClave}).unless({path: ["/usuario/login"]}));
+app.use(expressJwt({secret:jwtClave}).unless({path: ["/usuario/login"]}));
 app.use( (err, req, res, next)=> {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('No Autorizado');
