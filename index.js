@@ -14,7 +14,7 @@ app.use(express.json())
 app.use(expressJwt({secret:jwtClave}).unless({path: ["/usuario/login"]}));
 app.use( (err, req, res, next)=> {
   if (err.name === 'UnauthorizedError') {
-    res.status(401).send('No Autorizado');
+    res.status(401).send('Unauthorized');
   }
 });
 app.use('/conductor',conductor);
