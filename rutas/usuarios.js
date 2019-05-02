@@ -5,37 +5,44 @@ const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const url = "mongodb://localhost:27017";
 var jwtClave = "alan";
+const bcrypt = require("bcrypt");
 
 router.post("/login", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("usuarios")
-      .find({ $and: [{ username: req.body.username }, { pwd: req.body.pwd }] })
-      .count()
-      .then(c => {
-        if (c > 0) {
+      .find({ username: req.body.username })
+      .toArray()
+      .then(user => {
+       return bcrypt.compare(req.body.pwd,user[0].pwd);
+      })
+      .then(hash => {
+       if (hash) {
           var token = jwt.sign({ name: req.body.username }, jwtClave);
           res.status(200).send({ auth: true, token });
-        } else res.status(400).send({ error: true });
-      });
-    clt.close();
+        }
+      }).catch(err=>res.status(400).send({ error: true }))
+     clt.close();
   });
 });
 router.post("/new", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
-    db.collection("usuarios").insertOne(req.body, (err, rst) => {
-      if (err) res.status(400).json({ error: true });
-      else res.status(200).send(req.body);
+    bcrypt.hash(req.body.pwd, 10, function(error, hash) {
+      req.body.pwd = hash;
+      db.collection("usuarios").insertOne(req.body, (err, rst) => {
+        if (err) res.status(400).send({error:true});
+        else res.status(200).send(req.body);
+      });
+      clt.close();
     });
-    clt.close();
   });
 });
 router.get("/get", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("usuarios")
-      .find()
+      .find({username:{$ne:"administrador"}})
       .toArray()
       .then(data => {
         if (data) res.status(200).send(data);
@@ -47,28 +54,31 @@ router.get("/get", (req, res) => {
 router.put("/update", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
-    db.collection("usuarios").updateOne(
-      { _id: ObjectId(req.body._id) },
-      { $set: req.body },
-      (err, rsl) => {
-        if (err) res.send(err);
-        else res.send({ error: true });
-      }
-    );
 
-    clt.close();
+    bcrypt.hash(req.body.pwd, 10, (error, hash) =>{
+    db.collection("usuarios").updateOne(
+        { _id: ObjectId(req.body._id) },
+        { $set: { pwd: hash, rol: req.body.rol } },
+        (err, rsl) => {
+          if (err) res.send(err);
+          else res.send(rsl);
+        }
+      );
+      clt.close();
+     })
+    
   });
 });
 router.delete("/delete/:usuario", (req, res) => {
   console.log(req.params);
-  
+
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("usuarios").deleteOne(
       { username: req.params.usuario },
       (err, rst) => {
-        if(err)res.status(401).send({error:true})
-        else res.status(201).send({status:true})
+        if (err) res.status(401).send({ error: true });
+        else res.status(201).send({ status: true });
       }
     );
 
