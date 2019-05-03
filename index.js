@@ -8,7 +8,7 @@ var conductor = require("./rutas/conductor");
 var usuario=require("./rutas/usuarios")
 
 app.use(cors());
-//app.use(express.static('Documentos'));
+app.use(express.static('Documentos'));
 app.use(express.urlencoded());
 app.use(express.json())
 app.use(expressJwt({secret:jwtClave}).unless({path: ["/usuario/login"]}));

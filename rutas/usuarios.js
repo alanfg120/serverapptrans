@@ -14,15 +14,18 @@ router.post("/login", (req, res) => {
       .find({ username: req.body.username })
       .toArray()
       .then(user => {
-       return bcrypt.compare(req.body.pwd,user[0].pwd);
+        return bcrypt.compare(req.body.pwd, user[0].pwd);
       })
       .then(hash => {
-       if (hash) {
+        console.log(hash);
+
+        if (hash) {
           var token = jwt.sign({ name: req.body.username }, jwtClave);
           res.status(200).send({ auth: true, token });
-        }
-      }).catch(err=>res.status(400).send({ error: true }))
-     clt.close();
+        } else res.status(400).send({ error: true });
+      })
+      .catch(err => res.status(400).send({ error: true }));
+    clt.close();
   });
 });
 router.post("/new", (req, res) => {
@@ -31,7 +34,7 @@ router.post("/new", (req, res) => {
     bcrypt.hash(req.body.pwd, 10, function(error, hash) {
       req.body.pwd = hash;
       db.collection("usuarios").insertOne(req.body, (err, rst) => {
-        if (err) res.status(400).send({error:true});
+        if (err) res.status(400).send({ error: true });
         else res.status(200).send(req.body);
       });
       clt.close();
@@ -42,7 +45,7 @@ router.get("/get", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("usuarios")
-      .find({username:{$ne:"administrador"}})
+      .find({ username: { $ne: "administrador" } })
       .toArray()
       .then(data => {
         if (data) res.status(200).send(data);
@@ -55,8 +58,8 @@ router.put("/update", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
 
-    bcrypt.hash(req.body.pwd, 10, (error, hash) =>{
-    db.collection("usuarios").updateOne(
+    bcrypt.hash(req.body.pwd, 10, (error, hash) => {
+      db.collection("usuarios").updateOne(
         { _id: ObjectId(req.body._id) },
         { $set: { pwd: hash, rol: req.body.rol } },
         (err, rsl) => {
@@ -65,8 +68,7 @@ router.put("/update", (req, res) => {
         }
       );
       clt.close();
-     })
-    
+    });
   });
 });
 router.delete("/delete/:usuario", (req, res) => {

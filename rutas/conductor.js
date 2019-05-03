@@ -6,12 +6,11 @@ const url = "mongodb://localhost:27017";
 const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const fileUpload = require("express-fileupload");
-var mkdir=require('./../filesystem')
-
+var mkdir = require("./../filesystem");
 
 router.post("/upload", fileUpload(), (req, res) => {
   console.log(req.body);
-  MongoClient.connect(url,{ useNewUrlParser: true }, function(err, client) {
+  MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
     const db = client.db(dbName);
     db.collection("conductores")
       .find({ cedula: req.body.cedulaname })
@@ -38,7 +37,7 @@ router.post("/upload", fileUpload(), (req, res) => {
   });
 });
 router.post("/new", (req, res) => {
-  MongoClient.connect(url,{ useNewUrlParser: true }, function(err, client) {
+  MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
     const db = client.db(dbName);
     db.collection("conductores").insertOne(req.body, (err, data) => {
       console.log("listo");
@@ -59,6 +58,19 @@ router.post("/update", (req, res) => {
 
     client.close();
   });
-  res.send("listo")
+  res.send("listo");
+});
+router.get("/get", (req, res) => {
+  MongoClient.connect(url, (err, clt) => {
+    const db = clt.db(dbName);
+    db.collection("conductores")
+      .find()
+      .toArray()
+      .then(data => {
+        if (data) res.status(200).send(data);
+      })
+      .catch(err => res.status(400).send(err));
+    clt.close();
+  });
 });
 module.exports = router;
