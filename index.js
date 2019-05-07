@@ -6,6 +6,7 @@ var jwtClave="alan";
 var app = express();
 var conductor = require("./rutas/conductor");
 var usuario=require("./rutas/usuarios")
+var contrato=require("./rutas/contrato")
 
 app.use(cors());
 app.use(express.static('Documentos'));
@@ -19,7 +20,7 @@ app.use( (err, req, res, next)=> {
 });
 app.use('/conductor',conductor);
 app.use('/usuario',usuario);
-
+app.use('/contrato',contrato);
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
