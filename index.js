@@ -8,7 +8,7 @@ var conductor = require("./rutas/conductor");
 var usuario=require("./rutas/usuarios")
 var contrato=require("./rutas/contrato")
 var vehiculo=require("./rutas/vehiculo")
-
+var trailer=require("./rutas/trailer")
 app.use(cors());
 app.use(express.static('Documentos'));
 app.use(express.urlencoded());
@@ -23,6 +23,7 @@ app.use('/conductor',conductor);
 app.use('/usuario',usuario);
 app.use('/contrato',contrato);
 app.use('/vehiculo',vehiculo);
+app.use('/trailer',trailer);
 
 
 app.listen(3000, function () {
