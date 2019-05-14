@@ -5,6 +5,7 @@ const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const fileUpload = require("express-fileupload");
 var mkdir = require("./../filesystem");
+
 router.post("/upload", fileUpload(), (req, res) => {
   console.log(req.files);
   MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
@@ -53,6 +54,35 @@ router.post("/new", (req, res) => {
         } else res.send({ error: false });
       }
     );
+    clt.close();
+  });
+});
+router.get("/get/:tipo", (req, res) => {
+  MongoClient.connect(url, (err, clt) => {
+    const db = clt.db(dbName);
+    db.collection("trailers")
+      .find({tipo:req.params.tipo})
+      .toArray()
+      .then(data => {
+        if (data) res.status(200).send(data);
+        else res.status(400).send({ error: true });
+      });
+    clt.close();
+  });
+});
+router.delete("/delete/:trailer", (req, res) => {
+  console.log(req.params);
+
+  MongoClient.connect(url, (err, clt) => {
+    const db = clt.db(dbName);
+    db.collection("trailers").deleteOne(
+      { _id: ObjectId(req.params.trailer)  },
+      (err, rst) => {
+        if (err) res.status(401).send({ error: true });
+        else res.status(201).send({ status: true });
+      }
+    );
+
     clt.close();
   });
 });
