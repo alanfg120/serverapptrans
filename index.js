@@ -10,7 +10,7 @@ var contrato=require("./rutas/contrato")
 var vehiculo=require("./rutas/vehiculo")
 var trailer=require("./rutas/trailer")
 app.use(cors());
-app.use(express.static('Documentos'));
+app.use(express.static('asset'));
 app.use(express.urlencoded());
 app.use(express.json())
 app.use(expressJwt({secret:jwtClave}).unless({path: ["/usuario/login"]}));

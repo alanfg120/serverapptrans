@@ -18,7 +18,7 @@ router.post("/upload", fileUpload(), (req, res) => {
         console.log(c);
         if (c == 0) {
           try {
-            await mkdir.newdir(`Documentos/Vehiculos/${req.body.placa}`);
+            await mkdir.newdir(`static/Documentos/Vehiculos/${req.body.placa}`);
             console.log("listo");
           } catch (err) {
             console.log(err);
@@ -27,7 +27,7 @@ router.post("/upload", fileUpload(), (req, res) => {
           if (req.files) {
             Object.values(req.files).forEach(file => {
               file.mv(
-                `Documentos/Vehiculos/${req.body.placa}/${file.name}`,
+                `static/Documentos/Vehiculos/${req.body.placa}/${file.name}`,
                 err => {}
               );
             });
@@ -119,7 +119,7 @@ router.post("/upload/update", fileUpload(), (req, res) => {
   if (req.files) {
     Object.values(req.files).forEach(file => {
       file.mv(
-        `Documentos/Vehiculos/${req.body.placa}/${file.name}`,
+        `static/Documentos/Vehiculos/${req.body.placa}/${file.name}`,
         err => {}
       );
     });

@@ -18,7 +18,7 @@ router.post("/upload", fileUpload(), (req, res) => {
         if (c == 0) {
           try {
             await mkdir.newdir(
-              `Documentos/Trailes/${req.body.tipo}-${req.body.placa}`
+              `static/Documentos/Trailes/${req.body.tipo}-${req.body.placa}`
             );
             console.log("listo");
           } catch (err) {
@@ -28,7 +28,7 @@ router.post("/upload", fileUpload(), (req, res) => {
           if (req.files) {
             Object.values(req.files).forEach(file => {
               file.mv(
-                `Documentos/Trailes/${req.body.tipo}-${req.body.placa}/${
+                `static/Documentos/Trailes/${req.body.tipo}-${req.body.placa}/${
                   file.name
                 }`,
                 err => {}
@@ -86,4 +86,67 @@ router.delete("/delete/:trailer", (req, res) => {
     clt.close();
   });
 });
+router.get("/gettrailer/:placa", (req, res) => {
+  console.log(req.params);
+
+  MongoClient.connect(url, (err, clt) => {
+    const db = clt.db(dbName);
+    db.collection("trailers")
+      .find({ placa: req.params.placa })
+      .toArray()
+      .then(data => {
+        if (data) res.status(200).send(data[0]);
+      })
+      .catch(err => res.status(400).send(err));
+    clt.close();
+  });
+});
+router.put("/update", (req, res) => {
+  console.log(req.body);
+
+  let _id = req.body._id;
+  delete req.body._id;
+  MongoClient.connect(url, function(err, client) {
+    const db = client.db(dbName);
+    db.collection("trailers").findOneAndUpdate(
+      { _id: ObjectId(_id) },
+      { $set: req.body },
+      (err, rsl) => {
+        if (err) res.status(400).send({ error: true });
+        else res.status(200).send({ error: false });
+      }
+    );
+
+    client.close();
+  });
+});
+router.post("/upload/update", fileUpload(), (req, res) => {
+  if (req.files) {
+    Object.values(req.files).forEach(file => {
+      file.mv(
+        `static/Documentos/Trailes/${req.body.tipo}-${req.body.placa}/${
+          file.name
+        }`,
+        err => {}
+      );
+    });
+    res.send({ status: true });
+  } else res.send({ error: true });
+});
+router.put("/validar", (req, res) => {
+  
+  MongoClient.connect(url, (err, clt) => {
+    const db = clt.db(dbName);
+    db.collection("trailers").updateOne(
+      { _id: ObjectId(req.body._id) },
+      { $set: { valido: req.body.valid } },
+      (err,rsl)=>{
+        if(err)res.status(400).send({error:true})
+        else res.status(200).send({error:false})
+      }
+    );
+    clt.close()
+  });
+});
+
 module.exports = router;

@@ -17,7 +17,7 @@ router.post("/upload", fileUpload(), (req, res) => {
         console.log(c);
         if (c == 0) {
           try {
-            await mkdir.newdir(`Documentos/Conductores/${req.body.cedulaname}`);
+            await mkdir.newdir(`static/Documentos/Conductores/${req.body.cedulaname}`);
             console.log("listo");
           } catch (err) {
             console.log(err);
@@ -26,7 +26,7 @@ router.post("/upload", fileUpload(), (req, res) => {
           if (req.files) {
             Object.values(req.files).forEach(file => {
               file.mv(
-                `Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
+                `static/Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
                 err => {}
               );
             });
@@ -113,7 +113,7 @@ router.post("/upload/update", fileUpload(), (req, res) => {
   if (req.files) {
     Object.values(req.files).forEach(file => {
       file.mv(
-        `Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
+        `static/Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
         err => {}
       );
     });
