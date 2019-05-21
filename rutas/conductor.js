@@ -4,7 +4,7 @@ const url = "mongodb://localhost:27017";
 const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const fileUpload = require("express-fileupload");
-var mkdir = require("./../filesystem");
+var dir= require("./../filesystem");
 
 router.post("/upload", fileUpload(), (req, res) => {
   console.log(req.body);
@@ -17,7 +17,7 @@ router.post("/upload", fileUpload(), (req, res) => {
         console.log(c);
         if (c == 0) {
           try {
-            await mkdir.newdir(`static/Documentos/Conductores/${req.body.cedulaname}`);
+            await dir.newdir(`static/Documentos/Conductores/${req.body.cedulaname}`);
             console.log("listo");
           } catch (err) {
             console.log(err);
@@ -101,10 +101,13 @@ router.delete("/delete/:conductor", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("conductores").deleteOne(
-      { _id: ObjectId(req.params.conductor) },
+      { cedula: req.params.conductor},
       (err, rsl) => {
         if (err) res.status(400).send({ error: true });
-        else res.status(200).send({ error: false });
+        else {
+          dir.deletedir(`static/Documentos/Conductores/${req.params.conductor}`)
+          res.status(200).send({ error: false });
+        }
       }
     );
   });

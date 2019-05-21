@@ -1,4 +1,4 @@
-const fs = require("fs").promises;
+const fs = require("fs-extra");
 
 async function mkdir(dirpath) {
     try {
@@ -8,4 +8,15 @@ async function mkdir(dirpath) {
     }
   }
 
+  async function remove(path){
+   try {
+     await fs.remove(path)
+   } catch (err) {
+    if (err.code !== "EEXIST") throw err;
+   }
+
+  }
+
   module.exports.newdir=mkdir
+  module.exports.deletedir=remove
+  
