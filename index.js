@@ -11,7 +11,7 @@ var vehiculo=require("./rutas/vehiculo")
 var trailer=require("./rutas/trailer")
 app.use(cors());
 app.use(express.static(__dirname + '/dist'));
-app.use('/asset', express.static(__dirname + '/static'));
+app.use('/Documentos', express.static(__dirname + '/Documentos'));
 app.use(express.urlencoded());
 app.use(express.json())
 app.use(expressJwt({secret:jwtClave}).unless({path: ["/usuario/login","/dist"]}));

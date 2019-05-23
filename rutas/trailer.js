@@ -4,7 +4,7 @@ const url = "mongodb://localhost:27017";
 const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const fileUpload = require("express-fileupload");
-var mkdir = require("./../filesystem");
+var dir = require("./../filesystem");
 
 router.post("/upload", fileUpload(), (req, res) => {
   console.log(req.files);
@@ -17,8 +17,8 @@ router.post("/upload", fileUpload(), (req, res) => {
         console.log(c);
         if (c == 0) {
           try {
-            await mkdir.newdir(
-              `static/Documentos/Trailes/${req.body.tipo}-${req.body.placa}`
+            await dir.newdir(
+              `Documentos/Trailers/${req.body.placa}`
             );
             console.log("listo");
           } catch (err) {
@@ -28,7 +28,7 @@ router.post("/upload", fileUpload(), (req, res) => {
           if (req.files) {
             Object.values(req.files).forEach(file => {
               file.mv(
-                `static/Documentos/Trailes/${req.body.tipo}-${req.body.placa}/${
+                `Documentos/Trailers/${req.body.placa}/${
                   file.name
                 }`,
                 err => {}
@@ -76,10 +76,13 @@ router.delete("/delete/:trailer", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("trailers").deleteOne(
-      { _id: ObjectId(req.params.trailer)  },
+      { placa:req.params.trailer  },
       (err, rst) => {
         if (err) res.status(401).send({ error: true });
-        else res.status(201).send({ status: true });
+        else {
+          dir.deletedir(`Documentos/Trailers/${req.params.trailer}`)
+          res.status(201).send({ status: true });
+        }
       }
     );
 
@@ -124,7 +127,7 @@ router.post("/upload/update", fileUpload(), (req, res) => {
   if (req.files) {
     Object.values(req.files).forEach(file => {
       file.mv(
-        `static/Documentos/Trailes/${req.body.tipo}-${req.body.placa}/${
+        `Documentos/Trailers/${req.body.placa}/${
           file.name
         }`,
         err => {}

@@ -17,7 +17,7 @@ router.post("/upload", fileUpload(), (req, res) => {
         console.log(c);
         if (c == 0) {
           try {
-            await dir.newdir(`static/Documentos/Conductores/${req.body.cedulaname}`);
+            await dir.newdir(`Documentos/Conductores/${req.body.cedulaname}`);
             console.log("listo");
           } catch (err) {
             console.log(err);
@@ -26,7 +26,7 @@ router.post("/upload", fileUpload(), (req, res) => {
           if (req.files) {
             Object.values(req.files).forEach(file => {
               file.mv(
-                `static/Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
+                `Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
                 err => {}
               );
             });
@@ -105,7 +105,7 @@ router.delete("/delete/:conductor", (req, res) => {
       (err, rsl) => {
         if (err) res.status(400).send({ error: true });
         else {
-          dir.deletedir(`static/Documentos/Conductores/${req.params.conductor}`)
+          dir.deletedir(`Documentos/Conductores/${req.params.conductor}`)
           res.status(200).send({ error: false });
         }
       }
@@ -116,7 +116,7 @@ router.post("/upload/update", fileUpload(), (req, res) => {
   if (req.files) {
     Object.values(req.files).forEach(file => {
       file.mv(
-        `static/Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
+        `Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
         err => {}
       );
     });

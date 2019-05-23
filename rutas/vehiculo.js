@@ -4,7 +4,7 @@ const url = "mongodb://localhost:27017";
 const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const fileUpload = require("express-fileupload");
-var mkdir = require("./../filesystem");
+var dir = require("./../filesystem");
 
 
 router.post("/upload", fileUpload(), (req, res) => {
@@ -18,7 +18,7 @@ router.post("/upload", fileUpload(), (req, res) => {
         console.log(c);
         if (c == 0) {
           try {
-            await mkdir.newdir(`static/Documentos/Vehiculos/${req.body.placa}`);
+            await dir.newdir(`Documentos/Vehiculos/${req.body.placa}`);
             console.log("listo");
           } catch (err) {
             console.log(err);
@@ -27,7 +27,7 @@ router.post("/upload", fileUpload(), (req, res) => {
           if (req.files) {
             Object.values(req.files).forEach(file => {
               file.mv(
-                `static/Documentos/Vehiculos/${req.body.placa}/${file.name}`,
+                `Documentos/Vehiculos/${req.body.placa}/${file.name}`,
                 err => {}
               );
             });
@@ -71,10 +71,13 @@ router.delete("/delete/:vehiculo", (req, res) => {
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("vehiculos").deleteOne(
-      { _id: ObjectId(req.params.vehiculo) },
+      { placa:req.params.vehiculo},
       (err, rsl) => {
         if (err) res.status(400).send({ error: true });
-        else res.status(200).send({ error: false });
+        else {
+          dir.deletedir(`Documentos/Vehiculos/${req.params.vehiculo}`)
+          res.status(200).send({ error: false });
+        }
       }
     );
   });
@@ -119,7 +122,7 @@ router.post("/upload/update", fileUpload(), (req, res) => {
   if (req.files) {
     Object.values(req.files).forEach(file => {
       file.mv(
-        `static/Documentos/Vehiculos/${req.body.placa}/${file.name}`,
+        `Documentos/Vehiculos/${req.body.placa}/${file.name}`,
         err => {}
       );
     });
