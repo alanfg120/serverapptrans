@@ -9,6 +9,8 @@ var usuario=require("./rutas/usuarios")
 var contrato=require("./rutas/contrato")
 var vehiculo=require("./rutas/vehiculo")
 var trailer=require("./rutas/trailer")
+var job=require("./notificaciones")
+
 app.use(cors());
 app.use(express.static(__dirname + '/dist'));
 app.use('/Documentos', express.static(__dirname + '/Documentos'));
