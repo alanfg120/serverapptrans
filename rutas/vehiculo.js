@@ -20,19 +20,20 @@ router.post("/upload", fileUpload(), (req, res) => {
           try {
             await dir.newdir(`Documentos/Vehiculos/${req.body.placa}`);
             console.log("listo");
+            if (req.files) {
+              Object.values(req.files).forEach(file => {
+                file.mv(
+                  `Documentos/Vehiculos/${req.body.placa}/${file.name}`,
+                  err => {}
+                );
+              });
+              res.send({ error: false });
+            } else res.send({ error: true });
           } catch (err) {
             console.log(err);
           }
 
-          if (req.files) {
-            Object.values(req.files).forEach(file => {
-              file.mv(
-                `Documentos/Vehiculos/${req.body.placa}/${file.name}`,
-                err => {}
-              );
-            });
-            res.send({ error: false });
-          } else res.send({ error: true });
+        
         } else res.send({ error: true });
       });
     client.close();
@@ -99,7 +100,7 @@ router.get("/get/:placa", (req, res) => {
 });
 router.put("/update", (req, res) => {
  
-
+ console.log(req.body._id)
   let _id = req.body._id;
   delete req.body._id;
   MongoClient.connect(url, function(err, client) {

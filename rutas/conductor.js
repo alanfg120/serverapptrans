@@ -7,7 +7,7 @@ const fileUpload = require("express-fileupload");
 var dir= require("./../filesystem");
 
 router.post("/upload", fileUpload(), (req, res) => {
-  console.log(req.body);
+  console.log(req.files);
   MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
     const db = client.db(dbName);
     db.collection("conductores")
@@ -19,19 +19,20 @@ router.post("/upload", fileUpload(), (req, res) => {
           try {
             await dir.newdir(`Documentos/Conductores/${req.body.cedulaname}`);
             console.log("listo");
+            if (req.files) {
+              Object.values(req.files).forEach(file => {
+                file.mv(
+                  `Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
+                  err => {}
+                );
+              });
+              res.send({ status: true });
+            } else res.send({ error: true });
           } catch (err) {
             console.log(err);
           }
 
-          if (req.files) {
-            Object.values(req.files).forEach(file => {
-              file.mv(
-                `Documentos/Conductores/${req.body.cedulaname}/${file.name}`,
-                err => {}
-              );
-            });
-            res.send({ status: true });
-          } else res.send({ error: true });
+          
         } else res.send({ error: true });
       });
     client.close();

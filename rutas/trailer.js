@@ -21,21 +21,22 @@ router.post("/upload", fileUpload(), (req, res) => {
               `Documentos/Trailers/${req.body.placa}`
             );
             console.log("listo");
+            if (req.files) {
+              Object.values(req.files).forEach(file => {
+                file.mv(
+                  `Documentos/Trailers/${req.body.placa}/${
+                    file.name
+                  }`,
+                  err => {}
+                );
+              });
+              res.send({ status: true });
+            } else res.send({ error: true });
           } catch (err) {
             console.log(err);
           }
 
-          if (req.files) {
-            Object.values(req.files).forEach(file => {
-              file.mv(
-                `Documentos/Trailers/${req.body.placa}/${
-                  file.name
-                }`,
-                err => {}
-              );
-            });
-            res.send({ status: true });
-          } else res.send({ error: true });
+         
         } else res.send({ error: true });
       });
     client.close();
