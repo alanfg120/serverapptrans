@@ -4,10 +4,16 @@ const url = "mongodb://localhost:27017";
 const { ObjectId } = require("mongodb");
 const dbName = "apptrans";
 const fileUpload = require("express-fileupload");
-var dir= require("./../filesystem");
+var dir = require("./../filesystem");
+const PDFMerge = require("pdf-merge");
+var rutafiles = require("./../filesconductor");
+var documentos = require("./../filesconductor").documentos;
+var ip="167.99.154.108:3000"
+
+
+
 
 router.post("/upload", fileUpload(), (req, res) => {
-  console.log(req.files);
   MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
     const db = client.db(dbName);
     db.collection("conductores")
@@ -18,7 +24,6 @@ router.post("/upload", fileUpload(), (req, res) => {
         if (c == 0) {
           try {
             await dir.newdir(`Documentos/Conductores/${req.body.cedulaname}`);
-            console.log("listo");
             if (req.files) {
               Object.values(req.files).forEach(file => {
                 file.mv(
@@ -29,10 +34,8 @@ router.post("/upload", fileUpload(), (req, res) => {
               res.send({ status: true });
             } else res.send({ error: true });
           } catch (err) {
-            console.log(err);
+            throw err;
           }
-
-          
         } else res.send({ error: true });
       });
     client.close();
@@ -50,8 +53,6 @@ router.post("/new", (req, res) => {
   });
 });
 router.put("/update", (req, res) => {
-  console.log(req.body);
-
   let _id = req.body._id;
   delete req.body._id;
   MongoClient.connect(url, function(err, client) {
@@ -82,8 +83,6 @@ router.get("/get", (req, res) => {
   });
 });
 router.get("/get/:cedula", (req, res) => {
-  console.log(req.params);
-
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("conductores")
@@ -97,16 +96,14 @@ router.get("/get/:cedula", (req, res) => {
   });
 });
 router.delete("/delete/:conductor", (req, res) => {
-  console.log(req.params);
-
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("conductores").deleteOne(
-      { cedula: req.params.conductor},
+      { cedula: req.params.conductor },
       (err, rsl) => {
         if (err) res.status(400).send({ error: true });
         else {
-          dir.deletedir(`Documentos/Conductores/${req.params.conductor}`)
+          dir.deletedir(`Documentos/Conductores/${req.params.conductor}`);
           res.status(200).send({ error: false });
         }
       }
@@ -114,6 +111,7 @@ router.delete("/delete/:conductor", (req, res) => {
   });
 });
 router.post("/upload/update", fileUpload(), (req, res) => {
+  console.log(req.files);
   if (req.files) {
     Object.values(req.files).forEach(file => {
       file.mv(
@@ -125,18 +123,45 @@ router.post("/upload/update", fileUpload(), (req, res) => {
   } else res.send({ error: true });
 });
 router.put("/validar", (req, res) => {
-  
-  MongoClient.connect(url, (err, clt) => {
+ 
+MongoClient.connect(url, { useNewUrlParser: true }, (err, clt) => {
     const db = clt.db(dbName);
-    db.collection("conductores").updateOne(
-      { _id: ObjectId(req.body._id) },
-      { $set: { valido: req.body.valid } },
-      (err,rsl)=>{
-        if(err)res.status(400).send({error:true})
-        else res.status(200).send({error:false})
+    dir.count(`Documentos/Conductores/${req.body.cedula}`).then(files => {
+      let archivospendientes = documentos.filter(dif => !files.includes(dif));
+      if (archivospendientes.length > 0) {
+        db.collection("conductores").updateOne(
+          { cedula: req.body.cedula },
+          { $set: { pendientes: archivospendientes } },
+          (err, rsl) => {
+            if (err) res.status(400).send({ error: true });
+            else res.status(200).send(archivospendientes);
+          }
+        );
+        clt.close();
+      } else {
+        let ruta = `Documentos/Conductores/${
+          req.body.cedula
+        }/hojadevidaconductor.pdf`;
+
+        PDFMerge(rutafiles.rutafiles(req.body.cedula), { output: ruta }).then(
+          data => {
+            db.collection("conductores").updateOne(
+              { cedula: req.body.cedula },
+              { $set: { hojadevida: `http://${ip}/${ruta}`,pendientes:[]} },
+              (err, rsl) => {
+                console.log(err);
+                
+                if (err) res.status(400).send({ error: true });
+                else res.status(200).send({ error: false });
+              }
+            );
+            clt.close();
+          }
+        );
       }
-    );
-    clt.close()
+    });
+
+  
   });
 });
 module.exports = router;

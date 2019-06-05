@@ -15,7 +15,7 @@ function mail(correo,messaje){
         }
       });
       var mailOptions = {
-        from: "alanfg120@gmail.com",
+        from: "apptransnotificaciones@gmail.com",
         to: correo,
         subject: "Vencimiento de Documentos",
         text: messaje
