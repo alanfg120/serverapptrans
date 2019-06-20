@@ -12,19 +12,22 @@ router.post("/login", (req, res) => {
     const db = clt.db(dbName);
     db.collection("usuarios")
       .find({ username: req.body.username })
-      .toArray()
-      .then(user => {
-        return bcrypt.compare(req.body.pwd, user[0].pwd);
-      })
-      .then(hash => {
-        console.log(hash);
+      .toArray((err, user) => {
+      
+          bcrypt
+            .compare(req.body.pwd, user[0].pwd)
+            .then(hash => {
+              if (hash) {
+                var token = jwt.sign(
+                  { name: req.body.username, rol: user[0].rol },
+                  jwtClave
+                );
+                res.status(200).send({ auth: true, token });
+              } else res.status(400).send({ error: true });
+            })
+            .catch(err => res.status(400).send({ error: true }));
+      });
 
-        if (hash) {
-          var token = jwt.sign({ name: req.body.username }, jwtClave);
-          res.status(200).send({ auth: true, token });
-        } else res.status(400).send({ error: true });
-      })
-      .catch(err => res.status(400).send({ error: true }));
     clt.close();
   });
 });
@@ -42,6 +45,8 @@ router.post("/new", (req, res) => {
   });
 });
 router.get("/get", (req, res) => {
+  console.log(req.token);
+
   MongoClient.connect(url, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("usuarios")

@@ -54,7 +54,8 @@ router.post("/new", (req, res) => {
   
 });
 router.get("/get", (req, res) => {
-  MongoClient.connect(url, (err, clt) => {
+  
+  MongoClient.connect(url,{useNewUrlParser:true}, (err, clt) => {
     const db = clt.db(dbName);
     db.collection("vehiculos")
       .find()
@@ -65,6 +66,8 @@ router.get("/get", (req, res) => {
       .catch(err => res.status(400).send(err));
     clt.close();
   });
+
+  io.emit("message", "vehic5ulos");
 });
 router.delete("/delete/:vehiculo", (req, res) => {
   console.log(req.params);
