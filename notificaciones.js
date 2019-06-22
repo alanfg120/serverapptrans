@@ -25,7 +25,6 @@ var job = schedule.scheduleJob("40 19 * * *", function() {
       .toArray()
       .then(data => {
         console.log(data);
-
         if (data.length > 0)
           data.forEach(value => {
             if (value.licencia.vigencia == fechahoy) {
