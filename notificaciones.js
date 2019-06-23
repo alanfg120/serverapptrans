@@ -6,7 +6,7 @@ const dbName = "apptrans";
 const url = "mongodb://localhost:27017";
 var schedule = require("node-schedule");
 
-var job = schedule.scheduleJob("40 19 * * *", function() {
+var job = schedule.scheduleJob("15 8 * * *", function() {
   
   let cursosvencidos = [];
   var fecha = moment()
